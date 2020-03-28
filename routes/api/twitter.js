@@ -19,7 +19,7 @@ router.post("/", (req, res) => {
     const base64Token = Buffer.from(bearerTokenCredentials).toString("base64");
 
     const options = {
-        method: "POST",
+        method: "post",
         url: `${baseURL}/oauth2/token`,
         headers: {
             'Authorization': `Basic ${base64Token}`,
@@ -42,19 +42,21 @@ router.post("/", (req, res) => {
 // @access Private
 */
 router.get("/trends", middleware, async (req, res) => {
-    console.log(req.header("Authorization"));
-    axios.get(`${baseURL}/1.1/trends/place.json?id=1`)
-        .then(function (response) {
-            // handle success
-            res.send(response)
-        })
-        .catch(function (error) {
-            // handle error
-            res.send(error)
-        }).finally(function () {
-            // always executed
-            console.log("done")
-        });;
-})
+    const token = req.header("Authorization");
+    console.log(token)
+    const options = {
+        method: "GET",
+        url: `${baseURL}/1.1/trends/place.json?id=1`,
+        headers: {
+            'Authorization': token,
+        },
+    }
+    request(options, (err, resp, body) => {
+        if (err) res.send(err)
+        if (body) {
+            res.send(JSON.parse(body))
+        }
+    });
+});
 
 module.exports = router;

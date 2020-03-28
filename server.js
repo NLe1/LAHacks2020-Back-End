@@ -16,6 +16,7 @@ app.use(bodyParser.json())
 //Server configuration
 const PORT = process.env.PORT || 8080;
 app.use("/api/twitter", require("./routes/api/twitter"))
+app.use("/api/news", require("./routes/api/fetchnews"))
 
 //Create a route for the app
 app.get('/', (req, res) => {
