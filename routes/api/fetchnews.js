@@ -1,9 +1,12 @@
 // npm install newsapi --save
 const NewsAPI = require('newsapi');
-const newsapi = new NewsAPI('0293efdfc1f54c82968b654ed0140230');
 const express = require("express");
+const config = require("config");
 const router = express.Router();
 var query = 'test';
+
+//Set up
+const newsapi = new NewsAPI(config.get("newsapi.APIKey"));
 
 
 /* @GET  api/news/top
