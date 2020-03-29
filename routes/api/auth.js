@@ -3,6 +3,8 @@ const router = express.Router();
 
 var firebase = require("firebase/app");
 
+const db = firebase.firestore();
+
 // AUTHENTICATION Routes
 
 if (firebase.firestore()) {
@@ -19,43 +21,34 @@ if (firebase.auth()) {
 
 // Register the user
 router.post("/register", (req, res, next) => {
-    const { firstName, lastName, email, password, confirmPassword } = req.body;
+    const { firstName, lastName, email, password, tags } = req.body;
 
-    // Are any fields blank?
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-        res.status(400).send({
-            message: 'Some information is missing!'
-        });
-    }
-    // Do the passwords match?
-    else if (password !== confirmPassword) {
-        res.status(400).send({
-            message: 'Passwords don\'t match!'
-        });
-    }
-    // Everything look's good, create the user in auth and the DB... 
-    else {
-        firebase.auth()
-            .createUserWithEmailAndPassword(email, password)
-            .then(() => {
-                let docRef = db.collection('users').doc(email);
-                docRef.set({
-                    firstName: firstName,
-                    lastName: lastName,
-                    email: email
-                });
-                res.status(200).send({
-                    message: `Successfully registered!`
-                });
-            })
-            .catch(err => {
-                // Handle Errors here.
-                var errorCode = err.code;
-                res.status(400).send({
-                    message: `Something went wrong [error code ${errorCode}]`
-                });
+    firebase.auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then(() => {
+            console.log(`Successfully registered ${email}`);
+
+            let docRef = db.collection('users').doc(email);
+            docRef.set({
+                firstName: firstName,
+                lastName: lastName,
+                tags: tags
             });
-    }
+
+            console.log(`Successfully added ${email} to database!`);
+
+            res.status(200).send({
+                message: `Successfully registered!`,
+                tags: tags
+            });
+        })
+        .catch(err => {
+            // Handle Errors here.
+            console.log(`Couldn't register: ${err.message}`);
+            res.status(400).send({
+                message: `Couldn't register: ${err.message}`
+            });
+        });
 });
 
 // Login the user with firebase auth
@@ -63,22 +56,32 @@ router.post("/login", (req, res, next) => {
     firebase.auth()
         .signInWithEmailAndPassword(req.body.email, req.body.password)
         .then(() => {
-            res.status(200).send({
-                message: `Successfully logged in!`
-            });
+            let user = firebase.auth().currentUser;
+            console.log('Successfully logged in!');
+
+            db.collection('users')
+                .doc(user.email)
+                .get()
+                .then(doc => {
+                    const userData = JSON.parse(JSON.stringify(doc.data()));
+
+                    res.status(200).send({
+                        message: `Successfully logged in!`,
+                        tags: userData.tags
+                    });
+                });
         })
         .catch(err => {
             // Handle Errors here.
-            var errorCode = err.code;
+            var errorMsg = err.message;
             res.status(400).send({
-                message: `Something went wrong [error code ${errorCode}]`
+                message: `Something went wrong: ${errorMsg}`
             });
         });
 });
 
 // Logout the user with firebase auth
 router.post("/logout", (req, res, next) => {
-    console.log("Logout API called!");
     if (firebase.auth().currentUser) {
         firebase.auth()
             .signOut()
