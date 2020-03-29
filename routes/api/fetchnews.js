@@ -12,7 +12,7 @@ const newsapi = new NewsAPI(config.get("newsapi.APIKey"));
 // @desc get oauth bearer token
 // @access Private
 */
-router.get("/top", (req, res) => {
+router.post("/top", (req, res) => {
   newsapi.v2.topHeadlines({
     sources: '',
     q: query,
@@ -30,7 +30,7 @@ router.get("/top", (req, res) => {
 // @desc get oauth bearer token
 // @access Private
 */
-router.get("/results", (req, res) => {
+router.post("/results", (req, res) => {
   const { topic, pageNumber, paginationLength } = req.body;
 
   // en for language, us for country, and the user input for q, rest can be blank
