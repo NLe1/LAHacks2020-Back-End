@@ -31,11 +31,10 @@ router.get("/top", (req, res) => {
 // @access Private
 */
 router.get("/results", (req, res) => {
-  const { topic, page, pageSize } = req.query;
-
+  const { q, page, pageSize } = req.query;
   // en for language, us for country, and the user input for q, rest can be blank
   newsapi.v2.topHeadlines({
-    q: topic,
+    q,
     page,
     pageSize,
     language: 'en',

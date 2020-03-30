@@ -43,10 +43,9 @@ router.post("/", (req, res) => {
 */
 router.get("/trends", middleware, async (req, res) => {
     const token = req.header("Authorization");
-    console.log(token)
     const options = {
         method: "GET",
-        url: `${baseURL}/1.1/trends/place.json?id=1`,
+        url: `${baseURL}/1.1/trends/place.json?id=23424977`,
         headers: {
             'Authorization': token,
         },
