@@ -31,20 +31,15 @@ router.get("/top", (req, res) => {
 // @access Private
 */
 router.get("/results", (req, res) => {
-  const { topic, pageNumber, paginationLength } = req.body;
+  const { topic } = req.body;
 
   // en for language, us for country, and the user input for q, rest can be blank
   newsapi.v2.topHeadlines({
-    sources: '',
     q: topic,
-    category: '',
     language: 'en',
     country: 'us'
   }).then(response => {
-    const start = (pageNumber - 1) * paginationLength;
-    const end = start + paginationLength;
-    const results = response.articles.slice(start, end);
-    res.send(results);
+    res.send(response);
   }).catch(err => {
     res.send(err)
   });

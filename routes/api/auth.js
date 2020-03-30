@@ -53,8 +53,9 @@ router.post("/register", (req, res, next) => {
 
 // Login the user with firebase auth
 router.post("/login", (req, res, next) => {
+    const { email, password, } = req.body;
     firebase.auth()
-        .signInWithEmailAndPassword(req.body.email, req.body.password)
+        .signInWithEmailAndPassword(email, password)
         .then(() => {
             let user = firebase.auth().currentUser;
             console.log('Successfully logged in!');
@@ -64,7 +65,7 @@ router.post("/login", (req, res, next) => {
                 .get()
                 .then(doc => {
                     const userData = JSON.parse(JSON.stringify(doc.data()));
-
+                    console.log(userData)
                     res.status(200).send({
                         message: `Successfully logged in!`,
                         tags: userData.tags
