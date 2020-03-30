@@ -53,19 +53,24 @@ router.post("/register", (req, res, next) => {
 
 // Login the user with firebase auth
 router.post("/login", (req, res, next) => {
-    const { email, password, } = req.body;
+    const { email, password, tags } = req.body;
     firebase.auth()
         .signInWithEmailAndPassword(email, password)
         .then(() => {
             let user = firebase.auth().currentUser;
             console.log('Successfully logged in!');
-
-            db.collection('users')
-                .doc(user.email)
+            let userDB = db.collection('users').doc(user.email)
+            userDB
                 .get()
                 .then(doc => {
-                    const userData = JSON.parse(JSON.stringify(doc.data()));
-                    console.log(userData)
+                    const userData = doc.data();
+                    //if there is extra tags, write back to the database
+                    if (tags) {
+                        userData.tags = [...userData.tags, ...tags]
+                        //update tags whenever there is extra tags user 
+                        userDB.set(userData)
+                    }
+
                     res.status(200).send({
                         message: `Successfully logged in!`,
                         tags: userData.tags

@@ -3,20 +3,19 @@ const NewsAPI = require('newsapi');
 const express = require("express");
 const config = require("config");
 const router = express.Router();
-var query = 'test';
 
 // Set up
 const newsapi = new NewsAPI(config.get("newsapi.APIKey"));
+
 
 /* @GET  api/news/top
 // @desc get oauth bearer token
 // @access Private
 */
-router.post("/top", (req, res) => {
+router.get("/top", (req, res) => {
+  const { query } = req.query;
   newsapi.v2.topHeadlines({
-    sources: '',
     q: query,
-    category: '',
     language: 'en',
     country: 'us'
   }).then(response => {
@@ -31,14 +30,14 @@ router.post("/top", (req, res) => {
 // @param(topic: keyword, pageSize: number of results return per page, 20 is default, page: page number that want to query)
 // @access Private
 */
-router.post("/results", (req, res) => {
-  const { topic, pageSize, page } = req.body;
+router.get("/results", (req, res) => {
+  const { topic, page, pageSize } = req.query;
 
   // en for language, us for country, and the user input for q, rest can be blank
   newsapi.v2.topHeadlines({
     q: topic,
+    page,
     pageSize,
-    pageSize
     language: 'en',
     country: 'us'
   }).then(response => {
